@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.9]
+
+### Added
+- Support for TTS which implement an API contract (allows your own TTS)
+- Error values to control externally why open-dubbing is exiting (see exit_code.py)
+
+### Fixed
+- Do not need to merge back audios that have not been dubbed
+- If a file merge file fails, do not fail the whole batch
+
 ## [0.0.8]
 
 ### Added
