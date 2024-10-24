@@ -121,7 +121,7 @@ class Dubber:
         stt: SpeechToText,
         device: str,
         cpu_threads: int = 0,
-        debug: bool = False,
+        keep_intermediate_files: bool = False,
         pyannote_model: str = _DEFAULT_PYANNOTE_MODEL,
         number_of_steps: int = _NUMBER_OF_STEPS,
     ) -> None:
@@ -139,7 +139,7 @@ class Dubber:
         self.stt = stt
         self.device = device
         self.cpu_threads = cpu_threads
-        self.debug = debug
+        self.keep_intermediate_files = keep_intermediate_files
 
         if cpu_threads > 0:
             torch.set_num_threads(cpu_threads)
@@ -297,7 +297,7 @@ class Dubber:
         )
 
     def run_cleaning(self) -> None:
-        if self.debug:
+        if self.keep_intermediate_files:
             return
 
         output_directory = None

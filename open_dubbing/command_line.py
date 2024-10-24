@@ -110,9 +110,9 @@ class CommandLine:
             help="number of threads used for CPU inference (if is not specified uses defaults for each framework)",
         )
         parser.add_argument(
-            "--debug",
+            "--keep-intermediate-files",
             action="store_true",
-            help="keep intermediate files and generate specific files for debugging",
+            help="keep intermediate files used during the dubbing process",
         )
 
         parser.add_argument(

@@ -62,6 +62,12 @@ To install the open_dubbing in all platforms:
 pip install open_dubbing
 ```
 
+If you want to install also Coqui-tts, do:
+
+```shell
+pip install open_dubbing[coqui]
+```
+
 ## Linux additional dependencies
 
 In Linux you also need to install:

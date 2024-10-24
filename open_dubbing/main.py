@@ -260,7 +260,7 @@ def main():
         stt=stt,
         device=args.device,
         cpu_threads=args.cpu_threads,
-        debug=args.debug,
+        keep_intermediate_files=args.keep_intermediate_files,
     )
     logging.info(
         f"Processing '{args.input_file}' file with tts '{args.tts}', sst '{args.stt}' and device '{args.device}'"
