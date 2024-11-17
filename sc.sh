@@ -1,7 +1,7 @@
 # Script that mimics Softcatalà setup
 rm -f open_dubbing.log
 pip install .
-rm -r -f output/
+#rm -r -f output/
 branch_name=$(git rev-parse --abbrev-ref HEAD)
 
 declare -a target_languages=("cat")  # Catalan (cat) and French (fra)
