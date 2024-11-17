@@ -71,10 +71,10 @@ class Utterance:
 
         try:
             all_data = {}
-            if do_hash:
+            if unique_id:
                 utterance_metadata = self._add_unique_ids(utterance_metadata)
 
-            if unique_id:
+            if do_hash:
                 utterance_metadata = self._hash_utterances(utterance_metadata)
 
             all_data["utterances"] = utterance_metadata
