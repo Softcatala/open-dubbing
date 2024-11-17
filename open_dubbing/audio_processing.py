@@ -37,8 +37,31 @@ def _fix_mp3(source, target) -> None:
     cmd = f"ffmpeg -y -i {source} {target} > {null_device} 2>&1"
     os.system(cmd)
 
-
 def create_pyannote_timestamps(
+    *,
+    audio_file: str,
+    pipeline: Pipeline,
+    device: str = "cpu",
+) -> Sequence[Mapping[str, float]]:
+    """Creates timestamps from a vocals file using Pyannote speaker diarization.
+
+    Returns:
+        A list of dictionaries containing start and end timestamps for each
+        speaker segment.
+    """
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UserWarning)
+        if device == "cuda":
+            pipeline.to(torch.device("cuda"))
+        diarization = pipeline(audio_file)
+        utterance_metadata = [
+            {"start": segment.start, "end": segment.end, "speaker_id": speaker}
+            for segment, _, speaker in diarization.itertracks(yield_label=True)
+        ]
+        return utterance_metadata
+
+
+def create_pyannote_timestamps_new(
     *,
     audio_file: str,
     pipeline: Pipeline,
