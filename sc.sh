@@ -6,7 +6,7 @@ branch_name=$(git rev-parse --abbrev-ref HEAD)
 
 declare -a target_languages=("cat")  # Catalan (cat) and French (fra)
 declare -a inputs=($(find ../dubbing/od-videos/ -type f -name "*.mp4"))
-declare -a inputs=("videos/adminisiongrado.mp4" )
+declare -a inputs=("videos/jordi.mp4" )
 
 for input_file in "${inputs[@]}"; do
   output_directory="output/$(basename "${input_file%.*}").${branch_name}/"

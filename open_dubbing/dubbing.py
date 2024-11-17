@@ -198,9 +198,8 @@ class Dubber:
         audio_vocals_file, audio_background_file = (
             demucs.assemble_split_audio_file_paths(command=demucs_command)
         )
-
         utterance_metadata = audio_processing.create_pyannote_timestamps(
-            audio_file=audio_file,
+            audio_file=audio_vocals_file,
             pipeline=self.pyannote_pipeline,
             device=self.device,
         )
