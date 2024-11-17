@@ -433,17 +433,17 @@ class Dubber:
         )
         task_start_time = time.time()
 
-        self.run_translation()
-        times["translation"] = self.log_debug_task_and_getime(
-            "Translation completed", task_start_time
-        )
+#        self.run_translation()
+#        times["translation"] = self.log_debug_task_and_getime(
+#            "Translation completed", task_start_time
+#        )
 
-        task_start_time = time.time()
-        self.run_configure_text_to_speech()
-        self.run_text_to_speech()
-        times["tts"] = self.log_debug_task_and_getime(
-            "Text to speech completed", task_start_time
-        )
+ #       task_start_time = time.time()
+#        self.run_configure_text_to_speech()
+ #       self.run_text_to_speech()
+ #       times["tts"] = self.log_debug_task_and_getime(
+ #           "Text to speech completed", task_start_time
+ #       )
 
         task_start_time = time.time()
 
@@ -453,6 +453,7 @@ class Dubber:
             source_language=self.source_language,
         )
 
+        return
         self.run_postprocessing()
         self.run_cleaning()
         times["postprocessing"] = self.log_debug_task_and_getime(
