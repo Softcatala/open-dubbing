@@ -37,6 +37,7 @@ def _fix_mp3(source, target) -> None:
     cmd = f"ffmpeg -y -i {source} {target} > {null_device} 2>&1"
     os.system(cmd)
 
+
 def create_pyannote_timestamps(
     *,
     audio_file: str,
