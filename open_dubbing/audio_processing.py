@@ -52,7 +52,7 @@ def create_pyannote_timestamps(
     """
 
     with warnings.catch_warnings() and tempfile.NamedTemporaryFile(
-        delete=False
+        delete=False, suffix=".mp3"
     ) as temp_file:
         warnings.filterwarnings("ignore", category=UserWarning)
 
