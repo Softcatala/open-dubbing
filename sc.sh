@@ -5,8 +5,8 @@ pip install .
 branch_name=$(git rev-parse --abbrev-ref HEAD)
 
 declare -a target_languages=("cat")  # Catalan (cat) and French (fra)
-declare -a inputs=($(find ../dubbing/od-videos/ -type f -name "*.mp4"))
 declare -a inputs=("videos/adminisiongrado.mp4" )
+declare -a inputs=($(find ../dubbing/od-videos/ -type f -name "*.mp4"))
 
 for input_file in "${inputs[@]}"; do
   output_directory="output/$(basename "${input_file%.*}")/"
@@ -25,10 +25,6 @@ for input_file in "${inputs[@]}"; do
       --target_language_region="central" \
       --device=cpu \
       --log_level=INFO
-    if [ $? -ne 0 ]; then
-        echo "Error occurred with open-dubbing. Exiting loop."
-        exit 1
-    fi
     echo ""
   done
 done
