@@ -15,8 +15,6 @@
 
 import logging
 import os
-import platform
-import tempfile
 import warnings
 
 from typing import Final, Mapping, Sequence
@@ -29,13 +27,6 @@ from pydub import AudioSegment
 _DEFAULT_DUBBED_VOCALS_AUDIO_FILE: Final[str] = "dubbed_vocals.mp3"
 _DEFAULT_DUBBED_AUDIO_FILE: Final[str] = "dubbed_audio"
 _DEFAULT_OUTPUT_FORMAT: Final[str] = ".mp3"
-
-
-def _fix_mp3(source, target) -> None:
-
-    null_device = "NUL" if platform.system().lower() == "windows" else "/dev/null"
-    cmd = f"ffmpeg -y -i {source} {target} > {null_device} 2>&1"
-    os.system(cmd)
 
 
 def create_pyannote_timestamps(
@@ -59,39 +50,6 @@ def create_pyannote_timestamps(
             {"start": segment.start, "end": segment.end, "speaker_id": speaker}
             for segment, _, speaker in diarization.itertracks(yield_label=True)
         ]
-        return utterance_metadata
-
-
-def create_pyannote_timestamps_new(
-    *,
-    audio_file: str,
-    pipeline: Pipeline,
-    device: str = "cpu",
-) -> Sequence[Mapping[str, float]]:
-    """Creates timestamps from a vocals file using Pyannote speaker diarization.
-
-    Returns:
-        A list of dictionaries containing start and end timestamps for each
-        speaker segment.
-    """
-
-    with warnings.catch_warnings() and tempfile.NamedTemporaryFile(
-        delete=False, suffix=".mp3"
-    ) as temp_file:
-        warnings.filterwarnings("ignore", category=UserWarning)
-
-        _fix_mp3(audio_file, temp_file.name)
-
-        if device == "cuda":
-            pipeline.to(torch.device("cuda"))
-        diarization = pipeline(temp_file.name)
-        utterance_metadata = [
-            {"start": segment.start, "end": segment.end, "speaker_id": speaker}
-            for segment, _, speaker in diarization.itertracks(yield_label=True)
-        ]
-        if os.path.exists(temp_file.name):
-            os.remove(temp_file.name)
-
         return utterance_metadata
 
 
