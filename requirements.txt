@@ -6,7 +6,7 @@ torch >= 2.0.0,< 2.5
 pyannote.audio == 3.3.2
 pydub == 0.25.1
 ctranslate2 >= 4.1.0, <= 4.4.0
-faster-whisper == 1.0.3
+faster-whisper == 1.1.0
 transformers >= 4.40, <= 4.45.2
 
 spacy[ja] == 3.7.6

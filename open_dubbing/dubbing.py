@@ -33,6 +33,7 @@ from open_dubbing.demucs import Demucs
 from open_dubbing.exit_code import ExitCode
 from open_dubbing.preprocessing import PreprocessingArtifacts
 from open_dubbing.speech_to_text import SpeechToText
+from open_dubbing.subtitles import Subtitles
 from open_dubbing.text_to_speech import TextToSpeech
 from open_dubbing.translation import Translation
 from open_dubbing.utterance import Utterance
@@ -103,18 +104,18 @@ class Dubber:
         device: str,
         cpu_threads: int = 0,
         clean_intermediate_files: bool = False,
-        pyannote_model: str = _DEFAULT_PYANNOTE_MODEL,
-        number_of_steps: int = _NUMBER_OF_STEPS,
+        original_subtitles: bool = False,
+        dubbed_subtitles: bool = False,
     ) -> None:
         self._input_file = input_file
         self.output_directory = output_directory
         self.source_language = source_language
         self.target_language = target_language
         self.target_language_region = target_language_region
-        self.pyannote_model = pyannote_model
+        self.pyannote_model = _DEFAULT_PYANNOTE_MODEL
         self.hugging_face_token = hugging_face_token
         self.utterance_metadata = None
-        self._number_of_steps = number_of_steps
+        self._number_of_steps = _NUMBER_OF_STEPS
         self.tts = tts
         self.translation = translation
         self.stt = stt
@@ -122,6 +123,8 @@ class Dubber:
         self.cpu_threads = cpu_threads
         self.clean_intermediate_files = clean_intermediate_files
         self.preprocesing_output = None
+        self.original_subtitles = original_subtitles
+        self.dubbed_subtitles = dubbed_subtitles
 
         if cpu_threads > 0:
             torch.set_num_threads(cpu_threads)
@@ -340,6 +343,18 @@ class Dubber:
             video_file=dubbed_video_file,
         )
 
+    def _save_utterances(self):
+        metadata = {
+            "source_language": self.source_language,
+            "original_subtitles": self.original_subtitles,
+            "dubbed_subtitles": self.dubbed_subtitles,
+        }
+        Utterance(self.target_language, self.output_directory).save_utterances(
+            utterance_metadata=self.utterance_metadata,
+            preprocesing_output=self.preprocesing_output,
+            metadata=metadata,
+        )
+
     def update(self):
         times = {}
         start_time = time.time()
@@ -349,7 +364,7 @@ class Dubber:
 
         try:
             utterance = Utterance(self.target_language, self.output_directory)
-            self.utterance_metadata, self.preprocesing_output = (
+            self.utterance_metadata, self.preprocesing_output, _ = (
                 utterance.load_utterances()
             )
         except Exception as e:
@@ -359,8 +374,8 @@ class Dubber:
             )
             exit(ExitCode.UPDATE_MISSING_FILES)
 
-        paths, dubbed_paths = utterance.get_files_paths(self.utterance_metadata)
-        for path in paths + dubbed_paths:
+        _, dubbed_paths = utterance.get_files_paths(self.utterance_metadata)
+        for path in dubbed_paths:
             if not os.path.exists(path):
                 logging.error(
                     f"Cannot do update operation since file '{path}' is missing."
@@ -394,12 +409,8 @@ class Dubber:
 
         task_start_time = time.time()
         self.run_postprocessing()
-        Utterance(self.target_language, self.output_directory).save_utterances(
-            utterance_metadata=self.utterance_metadata,
-            preprocesing_output=self.preprocesing_output,
-            source_language=self.source_language,
-        )
-
+        self.run_generate_subtitles()
+        self._save_utterances()
         times["postprocessing"] = self.log_debug_task_and_getime(
             "Post processing completed", task_start_time
         )
@@ -413,6 +424,45 @@ class Dubber:
 
         self.log_maxrss_memory()
         logging.info("Output files saved in: %s.", self.output_directory)
+
+    def run_generate_subtitles(self):
+        if not self.original_subtitles and not self.dubbed_subtitles:
+            return
+
+        subtitles = Subtitles()
+
+        filename = f"{self.source_language}.srt"
+        source_srt = subtitles.write(
+            utterance_metadata=self.utterance_metadata,
+            directory=self.output_directory,
+            filename=filename,
+            translated=False,
+        )
+
+        filename = f"{self.target_language}.srt"
+        target_srt = subtitles.write(
+            utterance_metadata=self.utterance_metadata,
+            directory=self.output_directory,
+            filename=filename,
+            translated=True,
+        )
+
+        subtitles_files = []
+        languages_iso_639_3 = []
+
+        if self.original_subtitles:
+            subtitles_files.append(source_srt)
+            languages_iso_639_3.append(self.source_language)
+
+        if self.dubbed_subtitles:
+            subtitles_files.append(target_srt)
+            languages_iso_639_3.append(self.target_language)
+
+        subtitles.embbed_in_video(
+            video_file=self.postprocessing_output.video_file,
+            subtitles_files=subtitles_files,
+            languages_iso_639_3=languages_iso_639_3,
+        )
 
     def dub(self) -> PostprocessingArtifacts:
         """Orchestrates the entire dubbing process."""
@@ -448,6 +498,7 @@ class Dubber:
 
         task_start_time = time.time()
 
+<<<<<<< HEAD
         Utterance(self.target_language, self.output_directory).save_utterances(
             utterance_metadata=self.utterance_metadata,
             preprocesing_output=self.preprocesing_output,
@@ -455,7 +506,11 @@ class Dubber:
         )
 
         return
+=======
+>>>>>>> main
         self.run_postprocessing()
+        self.run_generate_subtitles()
+        self._save_utterances()
         self.run_cleaning()
         times["postprocessing"] = self.log_debug_task_and_getime(
             "Post processing completed", task_start_time

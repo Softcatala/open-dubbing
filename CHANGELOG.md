@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.1.3]
+
+### Added
+- Ability to add original and dubbed subtitles as stream in the output video
+
+### Fixed
+- Reduced the number of warnings from 3rd party libraries
+- Switch to ffmpeg to adjust the audio speed since pydub did not work in some cases
+
 ## [0.1.2]
 
 ### Fixed

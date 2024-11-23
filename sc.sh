@@ -5,7 +5,7 @@ pip install .
 branch_name=$(git rev-parse --abbrev-ref HEAD)
 
 declare -a target_languages=("cat")  # Catalan (cat) and French (fra)
-declare -a inputs=("videos/adminisiongrado.mp4" )
+declare -a inputs=("videos/jordi.mp4" )
 declare -a inputs=($(find ../dubbing/od-videos/ -type f -name "*.mp4"))
 
 for input_file in "${inputs[@]}"; do
@@ -24,6 +24,7 @@ for input_file in "${inputs[@]}"; do
       --tts_api_server=http://localhost:8100/ \
       --target_language_region="central" \
       --device=cpu \
+      --dubbed_subtitles\
       --log_level=INFO
     echo ""
   done

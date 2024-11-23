@@ -20,7 +20,7 @@ import os
 import shutil
 import tempfile
 
-from typing import Final, List, Tuple
+from typing import Dict, Final, List, Tuple
 
 from open_dubbing.preprocessing import PreprocessingArtifacts
 
@@ -46,19 +46,20 @@ class Utterance:
 
         with open(utterance_metadata_file, "r") as file:
             data = json.load(file)
-            utterance_metadata = data["utterances"]
+            utterances = data["utterances"]
             preprocesing_output = PreprocessingArtifacts(
                 **data["PreprocessingArtifacts"]
             )
+            metadata = data["metadata"]
 
-        return utterance_metadata, preprocesing_output
+        return utterances, preprocesing_output, metadata
 
     def save_utterances(
         self,
         *,
         utterance_metadata: str,
         preprocesing_output: str,
-        source_language: str,
+        metadata: Dict[str, str],
         do_hash: bool = True,
         unique_id: bool = True,
     ) -> None:
@@ -82,7 +83,8 @@ class Utterance:
                 all_data["PreprocessingArtifacts"] = dataclasses.asdict(
                     preprocesing_output
                 )
-            all_data["source_language"] = source_language
+            all_data["metadata"] = metadata
+
             json_data = json.dumps(all_data, ensure_ascii=False, indent=4)
             with tempfile.NamedTemporaryFile(
                 mode="w", delete=False, encoding="utf-8"

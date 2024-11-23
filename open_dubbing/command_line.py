@@ -161,4 +161,17 @@ class CommandLine:
             help="Update the dubbed video produced by a previous execution with the latest changes in utterance_metadata file",
         )
 
+        parser.add_argument(
+            "--original_subtitles",
+            action="store_true",
+            default=False,
+            help="Add original subtitles as stream in the output video",
+        )
+        parser.add_argument(
+            "--dubbed_subtitles",
+            default=False,
+            action="store_true",
+            help="Add dubbed subtitles as stream in the output video",
+        )
+
         return parser.parse_args()

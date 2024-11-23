@@ -1,0 +1,19 @@
+{
+    "utterances": [
+        {
+            "id": 1,
+            "text": "Good morning."
+        }
+    ],
+    "PreprocessingArtifacts": {
+        "video_file": "jordi_video.mp4",
+        "audio_file": "jordi_audio.mp3",
+        "audio_vocals_file": "htdemucs/jordi_audio/vocals.mp3",
+        "audio_background_file": "htdemucs/jordi_audio/no_vocals.mp3"
+    },
+    "metadata": {
+        "source_language": "eng",
+        "original_subtitles": false,
+        "dubbed_subtitles": false
+    }
+}

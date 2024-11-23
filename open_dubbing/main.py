@@ -16,6 +16,8 @@ import logging
 import os
 import sys
 
+import transformers
+
 from iso639 import Lang
 
 from open_dubbing.command_line import CommandLine
@@ -55,6 +57,7 @@ def _init_logging(log_level):
     logger.addHandler(console_handler)
 
     logging.getLogger("pydub.converter").setLevel(logging.ERROR)
+    transformers.logging.set_verbosity_error()
 
 
 def log_error_and_exit(msg: str, code: ExitCode):
@@ -261,6 +264,8 @@ def main():
         device=args.device,
         cpu_threads=args.cpu_threads,
         clean_intermediate_files=args.clean_intermediate_files,
+        original_subtitles=args.original_subtitles,
+        dubbed_subtitles=args.dubbed_subtitles,
     )
     logging.info(
         f"Processing '{args.input_file}' file with tts '{args.tts}', sst '{args.stt}' and device '{args.device}'"
