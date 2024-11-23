@@ -201,9 +201,9 @@ class Dubber:
         audio_vocals_file, audio_background_file = (
             demucs.assemble_split_audio_file_paths(command=demucs_command)
         )
+
         utterance_metadata = audio_processing.create_pyannote_timestamps(
             audio_file=audio_file,
-            #            audio_file=audio_vocals_file,
             pipeline=self.pyannote_pipeline,
             device=self.device,
         )
@@ -484,30 +484,20 @@ class Dubber:
         )
         task_start_time = time.time()
 
-        #        self.run_translation()
-        #        times["translation"] = self.log_debug_task_and_getime(
-        #            "Translation completed", task_start_time
-        #        )
+        self.run_translation()
+        times["translation"] = self.log_debug_task_and_getime(
+            "Translation completed", task_start_time
+        )
 
-        #       task_start_time = time.time()
-        #        self.run_configure_text_to_speech()
-        #       self.run_text_to_speech()
-        #       times["tts"] = self.log_debug_task_and_getime(
-        #           "Text to speech completed", task_start_time
-        #       )
+        task_start_time = time.time()
+        self.run_configure_text_to_speech()
+        self.run_text_to_speech()
+        times["tts"] = self.log_debug_task_and_getime(
+            "Text to speech completed", task_start_time
+        )
 
         task_start_time = time.time()
 
-<<<<<<< HEAD
-        Utterance(self.target_language, self.output_directory).save_utterances(
-            utterance_metadata=self.utterance_metadata,
-            preprocesing_output=self.preprocesing_output,
-            source_language=self.source_language,
-        )
-
-        return
-=======
->>>>>>> main
         self.run_postprocessing()
         self.run_generate_subtitles()
         self._save_utterances()
