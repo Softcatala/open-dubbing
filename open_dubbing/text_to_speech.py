@@ -23,8 +23,6 @@ from typing import Final, List, Mapping, NamedTuple, Sequence
 
 from pydub import AudioSegment
 
-_DEFAULT_CHUNK_SIZE: Final[int] = 150
-
 
 class Voice(NamedTuple):
     name: str
@@ -238,7 +236,6 @@ class TextToSpeech(ABC):
         reference_length: float,
         dubbed_file: str,
         speed: float,
-        chunk_size: int = _DEFAULT_CHUNK_SIZE,
     ) -> None:
         """Adjusts the speed of an MP3 file to match the reference file duration.
 
@@ -394,16 +391,11 @@ class TextToSpeech(ABC):
                             speed=speed,
                         )
                     else:
-                        chunk_size = utterance_copy.get(
-                            "chunk_size", _DEFAULT_CHUNK_SIZE
-                        )
                         self._adjust_audio_speed(
                             reference_length=reference_length,
                             dubbed_file=dubbed_path,
                             speed=speed,
-                            chunk_size=chunk_size,
                         )
-                        utterance_copy["chunk_size"] = chunk_size
 
             utterance_copy["dubbed_path"] = dubbed_path
             updated_utterance_metadata.append(utterance_copy)
