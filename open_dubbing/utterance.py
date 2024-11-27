@@ -75,8 +75,8 @@ class Utterance:
             if unique_id:
                 utterance_metadata = self._add_unique_ids(utterance_metadata)
 
-            #            if do_hash:
-            #                utterance_metadata = self._hash_utterances(utterance_metadata)
+            if do_hash:
+                utterance_metadata = self._hash_utterances(utterance_metadata)
 
             all_data["utterances"] = utterance_metadata
             if preprocesing_output:
