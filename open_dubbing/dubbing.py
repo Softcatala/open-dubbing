@@ -463,6 +463,7 @@ class Dubber:
             subtitles_files=subtitles_files,
             languages_iso_639_3=languages_iso_639_3,
         )
+        logging.info(f"Generated subtitles for languages {languages_iso_639_3}")
 
     def dub(self) -> PostprocessingArtifacts:
         """Orchestrates the entire dubbing process."""
