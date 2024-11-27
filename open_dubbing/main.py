@@ -57,6 +57,7 @@ def _init_logging(log_level):
     logger.addHandler(console_handler)
 
     logging.getLogger("pydub.converter").setLevel(logging.ERROR)
+    logging.getLogger("speechbrain").setLevel(logging.ERROR)
     transformers.logging.set_verbosity_error()
 
 
