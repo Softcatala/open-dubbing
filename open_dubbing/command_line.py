@@ -21,13 +21,25 @@ WHISPER_MODEL_NAMES = [
 ]
 
 
+class NewlinePreservingHelpFormatter(argparse.HelpFormatter):
+    def _split_lines(self, text, width):
+        # Split the text by explicit newlines first
+        lines = text.splitlines()
+        # Then apply the default behavior for line wrapping
+        wrapped_lines = []
+        for line in lines:
+            wrapped_lines.extend(argparse.HelpFormatter._split_lines(self, line, width))
+        return wrapped_lines
+
+
 class CommandLine:
 
     @staticmethod
     def read_parameters():
         """Parses command-line arguments and runs the dubbing process."""
         parser = argparse.ArgumentParser(
-            description="AI dubbing system which uses machine learning models to automatically translate and synchronize audio dialogue into different languages"
+            description="AI dubbing system which uses machine learning models to automatically translate and synchronize audio dialogue into different languages",
+            formatter_class=NewlinePreservingHelpFormatter,
         )
         parser.add_argument(
             "--input_file",
@@ -59,12 +71,12 @@ class CommandLine:
             default="mms",
             choices=["mms", "coqui", "edge", "cli", "api"],
             help=(
-                "Text to Speech engine to use. Choices are:"
-                "'mms': Meta Multilingual Speech engine, supports many languages."
-                "'coqui': Coqui TTS, an open-source alternative for high-quality TTS."
-                "'edge': Microsoft Edge TSS."
-                "'cli': User defined TTS invoked from command line"
-                "'api': Implements a user defined TTS API contract to enable non supported TTS"
+                "Text to Speech engine to use. Choices are:\n"
+                "'mms': Meta Multilingual Speech engine, supports +1100 languages.\n"
+                "'coqui': Coqui TTS, an open-source alternative for high-quality TTS.\n"
+                "'edge': Microsoft Edge TSS.\n"
+                "'cli': User defined TTS invoked from command line.\n"
+                "'api': Implements a user defined TTS API contract to enable non supported TTS.\n"
             ),
         )
         parser.add_argument(
@@ -73,10 +85,10 @@ class CommandLine:
             default="auto",
             choices=["auto", "faster-whisper", "transformers"],
             help=(
-                "Speech to text. Choices are:"
-                "'auto': Autoselect best implementation."
-                "'faster-whisper': Faster-whisper's OpenAI whisper implementation."
-                "'transformers': Transformers OpenAI whisper implementation."
+                "Speech to text. Choices are:\n"
+                "'auto': Autoselect best implementation.\n"
+                "'faster-whisper': Faster-whisper's OpenAI whisper implementation.\n"
+                "'transformers': Transformers OpenAI whisper implementation.\n"
             ),
         )
         parser.add_argument(
@@ -85,9 +97,9 @@ class CommandLine:
             default="nllb",
             choices=["nllb", "apertium"],
             help=(
-                "Text to Speech engine to use. Choices are:"
-                "'nllb': Meta's no Language Left Behind (NLLB)."
-                "'apertium'': Apertium compatible API server"
+                "Text to Speech engine to use. Choices are:\n"
+                "'nllb': Meta's no Language Left Behind (NLLB).\n"
+                "'apertium': Apertium compatible API server.\n"
             ),
         )
         parser.add_argument(
@@ -121,7 +133,9 @@ class CommandLine:
             type=str,
             default="nllb-200-3.3B",
             choices=["nllb-200-1.3B", "nllb-200-3.3B"],
-            help="NLLB translation model size. 'nllb-200-3.3B' gives best translation quality and 'nllb-200-1.3B' is the fastest",
+            help="Meta NLLB translation model size. Choices are:\n"
+            "'nllb-200-3.3B': gives best translation quality.\n"
+            "'nllb-200-1.3B': is the fastest.\n",
         )
 
         parser.add_argument(
@@ -140,7 +154,7 @@ class CommandLine:
         parser.add_argument(
             "--tts_cli_cfg_file",
             default="",
-            help="JSon configuration file when using a TTS which is involved by command line.",
+            help="JSon configuration file when using a TTS which is invoked from the command line.",
         )
 
         parser.add_argument(
