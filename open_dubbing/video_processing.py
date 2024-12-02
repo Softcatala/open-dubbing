@@ -17,7 +17,7 @@ import subprocess
 
 from typing import Final
 
-from ffmpeg import FFmpeg
+from open_dubbing.ffmpeg import FFmpeg
 
 _DEFAULT_FPS: Final[int] = 30
 _DEFAULT_DUBBED_VIDEO_FILE: Final[str] = "dubbed_video"
