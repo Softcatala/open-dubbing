@@ -37,6 +37,7 @@ class VideoProcessing:
 
         command = [
             "ffmpeg",
+            "-y",
             "-i",
             video_file,  # Input video file
             "-map",
@@ -81,6 +82,7 @@ class VideoProcessing:
 
         command = [
             "ffmpeg",
+            "-y",
             "-i",
             video_file,
             "-i",
