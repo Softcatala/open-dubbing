@@ -17,6 +17,8 @@ import subprocess
 
 from typing import Final
 
+from ffmpeg import FFmpeg
+
 _DEFAULT_FPS: Final[int] = 30
 _DEFAULT_DUBBED_VIDEO_FILE: Final[str] = "dubbed_video"
 _DEFAULT_OUTPUT_FORMAT: Final[str] = ".mp4"
@@ -53,9 +55,7 @@ class VideoProcessing:
             video_output_file,  # Extract video without audio
         ]
 
-        with open(os.devnull, "wb") as devnull:
-            subprocess.run(command, check=True, stdout=devnull, stderr=devnull)
-
+        FFmpeg().run(command)
         return video_output_file, audio_output_file
 
     @staticmethod
@@ -98,9 +98,7 @@ class VideoProcessing:
             dubbed_video_file,
         ]
 
-        with open(os.devnull, "wb") as devnull:
-            subprocess.run(command, check=True, stdout=devnull, stderr=devnull)
-
+        FFmpeg().run(command)
         return dubbed_video_file
 
     @staticmethod
