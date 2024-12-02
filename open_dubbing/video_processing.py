@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+import logging
 import os
 import subprocess
 
@@ -59,6 +61,22 @@ class VideoProcessing:
         return video_output_file, audio_output_file
 
     @staticmethod
+    def get_duration(file):
+        command = [
+            "ffprobe",
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "json",
+            file,
+        ]
+        result = subprocess.run(command, capture_output=True, text=True)
+        duration = json.loads(result.stdout)["format"]["duration"]
+        return float(duration)
+
+    @staticmethod
     def combine_audio_video(
         *,
         video_file: str,
@@ -78,6 +96,12 @@ class VideoProcessing:
             _DEFAULT_DUBBED_VIDEO_FILE
             + target_language_suffix
             + _DEFAULT_OUTPUT_FORMAT,
+        )
+
+        video_duration = VideoProcessing.get_duration(video_file)
+        audio_duration = VideoProcessing.get_duration(dubbed_audio_file)
+        logging.info(
+            f"Video duration: {video_duration}, Audio Duration: {audio_duration}"
         )
 
         command = [
