@@ -47,6 +47,7 @@ class TestVideoProcessing(unittest.TestCase):
         mock_subprocess.assert_called_once_with(
             [
                 "ffmpeg",
+                "-y",
                 "-i",
                 video_file,
                 "-map",
@@ -92,6 +93,7 @@ class TestVideoProcessing(unittest.TestCase):
         mock_subprocess.assert_called_once_with(
             [
                 "ffmpeg",
+                "-y",
                 "-i",
                 video_file,
                 "-i",
