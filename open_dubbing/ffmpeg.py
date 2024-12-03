@@ -53,3 +53,22 @@ class FFmpeg:
 
         if os.path.exists(tmp_filename):
             os.remove(tmp_filename)
+
+    def adjust_audio_speed(self, *, filename: str, speed: float):
+        tmp_filename = ""
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            tmp_filename = temp_file.name
+            shutil.copyfile(filename, tmp_filename)
+            cmd = [
+                "ffmpeg",
+                "-hide_banner",
+                "-y",
+                "-i",
+                tmp_filename,
+                "-filter:a",
+                f"atempo={speed}",
+                filename,
+            ]
+            FFmpeg()._run(command=cmd, fail=False)
+        if os.path.exists(filename):
+            os.remove(filename)

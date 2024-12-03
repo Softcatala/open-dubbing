@@ -15,8 +15,6 @@
 import logging
 import os
 import platform
-import shutil
-import tempfile
 
 from abc import ABC, abstractmethod
 from typing import Final, List, Mapping, NamedTuple, Sequence
@@ -220,36 +218,6 @@ class TextToSpeech(ABC):
             speaker_to_paths_mapping[speaker_id].append(utterance["vocals_path"])
         return speaker_to_paths_mapping
 
-    def _adjust_audio_speed(
-        self,
-        *,
-        reference_length: float,
-        dubbed_file: str,
-        speed: float,
-    ) -> None:
-        """Adjusts the speed of an MP3 file to match the reference file duration.
-
-        The speed will not be adjusted if the dubbed file has a duration that
-        is the same or shorter than the duration of the reference file.
-        """
-
-        filename = ""
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            shutil.copyfile(dubbed_file, temp_file.name)
-            null_device = (
-                "NUL" if platform.system().lower() == "windows" else "/dev/null"
-            )
-            cmd = f'ffmpeg -y -i {temp_file.name} -filter:a "atempo={speed}" {dubbed_file} > {null_device} 2>&1'
-            os.system(cmd)
-            filename = temp_file.name
-
-        if os.path.exists(filename):
-            os.remove(filename)
-
-        logging.debug(
-            f"text_to_speech.adjust_audio_speed: dubbed_audio: {dubbed_file}, speed: {speed}"
-        )
-
     def _does_voice_supports_speeds(self):
         return False
 
@@ -315,7 +283,6 @@ class TextToSpeech(ABC):
                     dubbed_path = f"chunk_{utterance['start']}_{utterance['end']}.mp3"
             else:
                 assigned_voice = utterance_copy["assigned_voice"]
-                reference_length = utterance_copy["end"] - utterance_copy["start"]
                 text = utterance_copy["translated_text"]
                 try:
                     path = utterance_copy["path"]
@@ -381,10 +348,12 @@ class TextToSpeech(ABC):
                             speed=speed,
                         )
                     else:
-                        self._adjust_audio_speed(
-                            reference_length=reference_length,
+                        FFmpeg().adjust_audio_speed(
                             dubbed_file=dubbed_path,
                             speed=speed,
+                        )
+                        logging.debug(
+                            f"text_to_speech.adjust_audio_speed: dubbed_audio: {dubbed_path}, speed: {speed}"
                         )
 
             utterance_copy["dubbed_path"] = dubbed_path
