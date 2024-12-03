@@ -103,5 +103,5 @@ class TextToSpeechAPI(TextToSpeech):
             languages.add(language)
 
         languages = sorted(list(languages))
-        logging.debug(f"text_to_speech_api.get_languages: {languages}'")
+        logging.debug(f"text_to_speech_api.get_languages: {languages}")
         return languages

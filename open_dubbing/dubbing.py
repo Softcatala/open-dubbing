@@ -122,7 +122,7 @@ class Dubber:
         self.device = device
         self.cpu_threads = cpu_threads
         self.clean_intermediate_files = clean_intermediate_files
-        self.preprocesing_output = None
+        self.preprocessing_output = None
         self.original_subtitles = original_subtitles
         self.dubbed_subtitles = dubbed_subtitles
 
@@ -213,7 +213,7 @@ class Dubber:
             output_directory=self.output_directory,
         )
         self.utterance_metadata = utterance_metadata
-        self.preprocesing_output = PreprocessingArtifacts(
+        self.preprocessing_output = PreprocessingArtifacts(
             video_file=video_file,
             audio_file=audio_file,
             audio_vocals_file=audio_vocals_file,
@@ -228,9 +228,9 @@ class Dubber:
         """
 
         media_file = (
-            self.preprocesing_output.video_file
-            if self.preprocesing_output.video_file
-            else self.preprocesing_output.audio_file
+            self.preprocessing_output.video_file
+            if self.preprocessing_output.video_file
+            else self.preprocessing_output.audio_file
         )
         utterance_metadata = self.stt.transcribe_audio_chunks(
             utterance_metadata=self.utterance_metadata,
@@ -282,7 +282,7 @@ class Dubber:
             utterance_metadata=self.utterance_metadata,
             output_directory=self.output_directory,
             target_language=self.target_language,
-            audio_file=self.preprocesing_output.audio_file,
+            audio_file=self.preprocessing_output.audio_file,
             adjust_speed=True,
         )
 
@@ -317,23 +317,23 @@ class Dubber:
         """
         dubbed_audio_vocals_file = audio_processing.insert_audio_at_timestamps(
             utterance_metadata=self.utterance_metadata,
-            background_audio_file=self.preprocesing_output.audio_background_file,
+            background_audio_file=self.preprocessing_output.audio_background_file,
             output_directory=self.output_directory,
         )
         dubbed_audio_file = audio_processing.merge_background_and_vocals(
-            background_audio_file=self.preprocesing_output.audio_background_file,
+            background_audio_file=self.preprocessing_output.audio_background_file,
             dubbed_vocals_audio_file=dubbed_audio_vocals_file,
             output_directory=self.output_directory,
             target_language=self.target_language,
             vocals_volume_adjustment=5.0,
             background_volume_adjustment=0.0,
         )
-        if not self.preprocesing_output.video_file:
+        if not self.preprocessing_output.video_file:
             raise ValueError(
                 "A video file must be provided if the input file is a video."
             )
         dubbed_video_file = VideoProcessing.combine_audio_video(
-            video_file=self.preprocesing_output.video_file,
+            video_file=self.preprocessing_output.video_file,
             dubbed_audio_file=dubbed_audio_file,
             output_directory=self.output_directory,
             target_language=self.target_language,
@@ -351,7 +351,7 @@ class Dubber:
         }
         Utterance(self.target_language, self.output_directory).save_utterances(
             utterance_metadata=self.utterance_metadata,
-            preprocesing_output=self.preprocesing_output,
+            preprocessing_output=self.preprocessing_output,
             metadata=metadata,
         )
 
@@ -364,7 +364,7 @@ class Dubber:
 
         try:
             utterance = Utterance(self.target_language, self.output_directory)
-            self.utterance_metadata, self.preprocesing_output, _ = (
+            self.utterance_metadata, self.preprocessing_output, _ = (
                 utterance.load_utterances()
             )
         except Exception as e:
@@ -400,7 +400,7 @@ class Dubber:
             utterance_metadata=modified_utterances,
             output_directory=self.output_directory,
             target_language=self.target_language,
-            audio_file=self.preprocesing_output.audio_file,
+            audio_file=self.preprocessing_output.audio_file,
             adjust_speed=True,
         )
         times["tts"] = self.log_debug_task_and_getime(

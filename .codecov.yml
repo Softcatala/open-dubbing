@@ -2,5 +2,6 @@ coverage:
   status:
     project:
       default:
-        threshold: 10%
-
+        enabled: yes
+        threshold: 0
+        base: auto

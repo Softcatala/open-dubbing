@@ -46,7 +46,7 @@ class TextToSpeechEdge(TextToSpeech):
         edge_voices = voice_manager.find(Language=iso_639_1)
         for edge_voice in edge_voices:
             if not all(key in edge_voice for key in ["ShortName", "Gender", "Locale"]):
-                logging.warn(
+                logging.warning(
                     f"Skipping voice '{edge_voice}' since is missing some fields"
                 )
                 continue

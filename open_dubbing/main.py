@@ -25,7 +25,7 @@ from open_dubbing.dubbing import Dubber
 from open_dubbing.exit_code import ExitCode
 from open_dubbing.speech_to_text_faster_whisper import SpeechToTextFasterWhisper
 from open_dubbing.speech_to_text_whisper_transformers import (
-    SpeechToTextWhisperTransfomers,
+    SpeechToTextWhisperTransformers,
 )
 from open_dubbing.text_to_speech_api import TextToSpeechAPI
 from open_dubbing.text_to_speech_cli import TextToSpeechCLI
@@ -213,7 +213,7 @@ def main():
 
     if args.stt == "auto":
         if sys.platform == "darwin":
-            stt = SpeechToTextWhisperTransfomers(
+            stt = SpeechToTextWhisperTransformers(
                 model_name=args.whisper_model,
                 device=args.device,
                 cpu_threads=args.cpu_threads,
@@ -231,7 +231,7 @@ def main():
             cpu_threads=args.cpu_threads,
         )
     else:
-        stt = SpeechToTextWhisperTransfomers(
+        stt = SpeechToTextWhisperTransformers(
             model_name=args.whisper_model,
             device=args.device,
             cpu_threads=args.cpu_threads,

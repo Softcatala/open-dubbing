@@ -41,24 +41,24 @@ class Utterance:
         )
         return utterance_metadata_file
 
-    def load_utterances(self) -> tuple[str, str]:
+    def load_utterances(self) -> tuple[str, str, str]:
         utterance_metadata_file = self._get_file_name()
 
         with open(utterance_metadata_file, "r") as file:
             data = json.load(file)
             utterances = data["utterances"]
-            preprocesing_output = PreprocessingArtifacts(
+            preprocessing_output = PreprocessingArtifacts(
                 **data["PreprocessingArtifacts"]
             )
             metadata = data["metadata"]
 
-        return utterances, preprocesing_output, metadata
+        return utterances, preprocessing_output, metadata
 
     def save_utterances(
         self,
         *,
         utterance_metadata: str,
-        preprocesing_output: str,
+        preprocessing_output: str,
         metadata: Dict[str, str],
         do_hash: bool = True,
         unique_id: bool = True,
@@ -79,9 +79,9 @@ class Utterance:
                 utterance_metadata = self._hash_utterances(utterance_metadata)
 
             all_data["utterances"] = utterance_metadata
-            if preprocesing_output:
+            if preprocessing_output:
                 all_data["PreprocessingArtifacts"] = dataclasses.asdict(
-                    preprocesing_output
+                    preprocessing_output
                 )
             all_data["metadata"] = metadata
 
@@ -101,7 +101,6 @@ class Utterance:
             )
         except Exception as e:
             logging.warning(f"Error saving utterance metadata: {e}")
-        self.save_utterance_metadata_output = utterance_metadata_file
 
     def _hash_utterances(self, utterance_metadata):
         for utterance in utterance_metadata:

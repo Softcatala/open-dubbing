@@ -40,7 +40,7 @@ class TestCommandLine:
             assert args.output_directory == "test_output"
             assert args.target_language == "fra"
 
-    def test_mising_required_argument(self):
+    def test_missing_required_argument(self):
         with patch(
             "sys.argv",
             [
@@ -52,4 +52,4 @@ class TestCommandLine:
             ],
         ), pytest.raises(SystemExit):
             CommandLine.read_parameters()
-            assert False  # shoult not arrive here
+            assert False  # should not arrive here

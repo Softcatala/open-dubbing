@@ -24,7 +24,7 @@ from transformers import WhisperForConditionalGeneration, WhisperProcessor
 from open_dubbing.speech_to_text import SpeechToText
 
 
-class SpeechToTextWhisperTransfomers(SpeechToText):
+class SpeechToTextWhisperTransformers(SpeechToText):
 
     def __init__(self, *, model_name="medium", device="cpu", cpu_threads=0):
         super().__init__(device=device, model_name=model_name, cpu_threads=cpu_threads)

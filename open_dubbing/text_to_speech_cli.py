@@ -27,7 +27,7 @@ class TextToSpeechCLI(TextToSpeech):
         super().__init__()
         self.device = device
         self.configuration = self.load_json(configuration_file)
-        self.output_dir = os.path.abspath("tts-ouput/")
+        self.output_dir = os.path.abspath("tts-output/")
 
     def load_json(self, configuration_file):
         with open(configuration_file, "r") as file:

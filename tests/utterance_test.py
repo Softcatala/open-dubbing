@@ -39,7 +39,7 @@ class TestUterrance:
             utterance.save_utterances(
                 metadata={"source_language": "spa"},
                 utterance_metadata=utterance_metadata,
-                preprocesing_output=None,
+                preprocessing_output=None,
             )
             metadata_file = os.path.join(directory, "utterance_metadata_cat.json")
             with open(metadata_file, encoding="utf-8") as json_data:
@@ -249,10 +249,10 @@ class TestUterrance:
         directory = os.path.join(directory, "data/")
         utterance = Utterance(target_language="cat", output_directory=directory)
 
-        utterances, preprocesing_output, metadata = utterance.load_utterances()
+        utterances, preprocessing_output, metadata = utterance.load_utterances()
         assert utterances == [{"id": 1, "text": "Good morning."}]
 
-        assert preprocesing_output == PreprocessingArtifacts(
+        assert preprocessing_output == PreprocessingArtifacts(
             video_file="jordi_video.mp4",
             audio_file="jordi_audio.mp3",
             audio_vocals_file="htdemucs/jordi_audio/vocals.mp3",

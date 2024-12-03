@@ -59,10 +59,10 @@ class TranslationNLLB(Translation):
             )
         except RuntimeError as e:
             if self.device == "cuda":
-                return AutoModelForSeq2SeqLM.from_pretrained(self.model_name).to("cpu")
                 logging.warning(
                     f"Loading translation model {self.model_name} in CPU since cannot be load in GPU"
                 )
+                return AutoModelForSeq2SeqLM.from_pretrained(self.model_name).to("cpu")
             else:
                 raise e
 

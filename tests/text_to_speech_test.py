@@ -58,24 +58,23 @@ class TextToSpeechUT(TextToSpeech):
 
 class TestTextToSpeech:
 
-    def test_calculate_target_utterance_speed(self):
-        END_BLOCK = 60
+    @pytest.mark.parametrize("end_block, expected_result", [(60, 1.5), (91, 1.0)])
+    def test_calculate_target_utterance_speed(self, end_block, expected_result):
         DURATION = 90
 
         tts = TextToSpeechUT()
         with tempfile.TemporaryDirectory() as tempdir, patch.object(
-            tts, "get_start_time_of_next_speech_utterance", return_value=END_BLOCK
+            tts, "get_start_time_of_next_speech_utterance", return_value=end_block
         ):
             dubbed_audio_mock = AudioSegment.silent(duration=DURATION * 1000)
             dubbed_file_path = os.path.join(tempdir, "dubbed.mp3")
             dubbed_audio_mock.export(dubbed_file_path, format="mp3")
             result = tts._calculate_target_utterance_speed(
                 start=0,
-                end=60,
+                end=end_block,
                 dubbed_file=dubbed_file_path,
                 utterance_metadata="mocked",
             )
-            expected_result = (DURATION * 1000) / (END_BLOCK * 1000)
             assert result == expected_result
 
     @pytest.mark.parametrize(

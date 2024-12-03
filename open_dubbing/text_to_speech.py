@@ -208,7 +208,7 @@ class TextToSpeech(ABC):
         reference_length = end - start
         dubbed_audio = AudioSegment.from_file(dubbed_file)
         dubbed_duration = dubbed_audio.duration_seconds
-        r = dubbed_duration / reference_length
+        r = round(dubbed_duration / reference_length, 1)
         logging.debug(f"text_to_speech._calculate_target_utterance_speed: {r}")
         return r
 

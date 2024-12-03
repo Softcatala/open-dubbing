@@ -58,7 +58,9 @@ class TranslationApertium(Translation):
             source = pair["sourceLanguage"]
             target = pair["targetLanguage"]
             if len(source) != 3 or len(target) != 3:
-                logging.warn(f"Discarting Apertium language pair: '{source}-{target}'")
+                logging.warning(
+                    f"Discarding Apertium language pair: '{source}-{target}'"
+                )
                 continue
 
             pair = (pair["sourceLanguage"], pair["targetLanguage"])
