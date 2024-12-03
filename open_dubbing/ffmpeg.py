@@ -21,21 +21,18 @@ import tempfile
 
 class FFmpeg:
 
-    def _run(self, *, command: str):
+    def _run(self, *, command: str, fail: bool = True):
         with open(os.devnull, "wb") as devnull:
             try:
-                result = subprocess.run(
-                    command, stdout=devnull, stderr=subprocess.STDOUT
-                )
-                # Check the return code
+                result = subprocess.run(command, stdout=devnull, stderr=subprocess.PIPE)
                 if result.returncode != 0:
                     raise subprocess.CalledProcessError(result.returncode, command)
             except subprocess.CalledProcessError as e:
                 logging.error(
-                    f"Error: Command {command} failed with exit code {e.returncode}"
+                    f"Error running command: {command} failed with exit code {e.returncode} and output '{result.stderr}'"
                 )
-                logging.error(f"Command output:\n{result.stdout}")
-                raise
+                if fail:
+                    raise
 
     def remove_silence(self, *, filename: str):
         tmp_filename = ""
@@ -44,14 +41,15 @@ class FFmpeg:
             shutil.copyfile(filename, tmp_filename)
             cmd = [
                 "ffmpeg",
+                "-hide_banner",
                 "-y",
                 "-i",
-                tmp_filename,
+                "X" + tmp_filename,
                 "-af",
                 "silenceremove=stop_periods=-1:stop_duration=0.1:stop_threshold=-50dB",
                 filename,
             ]
-            FFmpeg()._run(command=cmd)
+            FFmpeg()._run(command=cmd, fail=False)
 
         if os.path.exists(tmp_filename):
             os.remove(tmp_filename)
