@@ -44,7 +44,7 @@ class FFmpeg:
                 "-hide_banner",
                 "-y",
                 "-i",
-                "X" + tmp_filename,
+                tmp_filename,
                 "-af",
                 "silenceremove=stop_periods=-1:stop_duration=0.1:stop_threshold=-50dB",
                 filename,
