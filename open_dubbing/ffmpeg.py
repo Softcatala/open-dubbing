@@ -45,7 +45,7 @@ class FFmpeg:
             source,
             target,
         ]
-        FFmpeg()._run(command=cmd, fail=False)
+        FFmpeg()._run(command=cmd)
 
     def remove_silence(self, *, filename: str):
         tmp_filename = ""
@@ -83,6 +83,7 @@ class FFmpeg:
                 filename,
             ]
             FFmpeg()._run(command=cmd, fail=False)
+
         if os.path.exists(filename):
             os.remove(filename)
 
