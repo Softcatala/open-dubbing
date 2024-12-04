@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-import shutil
 import tempfile
 
 from open_dubbing.subtitles import Subtitles
@@ -108,45 +107,3 @@ class TestSubtitles:
             "Sóc de Barcelona.",
             "",
         ]
-
-    def _get_copied_tmp_mp4(self):
-        mp4_file = tempfile.NamedTemporaryFile(suffix=".mp4", delete=False)
-        directory = os.path.dirname(os.path.realpath(__file__))
-        video_file = os.path.join(directory, "data/englishvideo.mp4")
-        shutil.copyfile(video_file, mp4_file.name)
-        return mp4_file
-
-    def _get_write_srt_test(self):
-        srt_file_fh = tempfile.NamedTemporaryFile(suffix=".srt", delete=False, mode="w")
-        # Write subtitles
-        for line in self._get_srt():
-            srt_file_fh.write(f"{line}\n")
-
-        srt_file_fh.close()
-        return srt_file_fh
-
-    def _read_str_from_video(self, filename):
-        tmp_srt = tempfile.NamedTemporaryFile(suffix=".srt", delete=False, mode="w")
-
-        cmd = f"ffmpeg -y -i {filename} -map 0:s:0 {tmp_srt.name}"
-        os.system(cmd)
-
-        return self._get_lines_from_file(tmp_srt.name)
-
-    def test_embbed_in_video(self):
-        tmp_mp4_file = self._get_copied_tmp_mp4()
-        tmp_str_test = self._get_write_srt_test()
-
-        subtitles = Subtitles()
-
-        subtitles.embbed_in_video(
-            video_file=tmp_mp4_file.name,
-            subtitles_files=[tmp_str_test.name],
-            languages_iso_639_3=["cat"],
-        )
-
-        subtitles = self._read_str_from_video(tmp_mp4_file.name)
-
-        [os.remove(f) for f in [tmp_mp4_file.name, tmp_str_test.name]]
-        expected = self._get_srt()
-        assert subtitles == expected

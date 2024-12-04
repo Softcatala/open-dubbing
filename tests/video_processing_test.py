@@ -17,8 +17,6 @@
 import os
 import tempfile
 
-from unittest.mock import MagicMock, patch
-
 import numpy as np
 
 from moviepy.audio.AudioClip import AudioArrayClip
@@ -97,19 +95,3 @@ class TestVideoProcessing:
                 target_language="en-US",
             )
             assert os.path.exists(output_path)
-
-    @patch("subprocess.run")
-    def test_is_ffmpeg_installed(self, mock_subprocess):
-        # Test when ffmpeg is installed
-        mock_subprocess.return_value = MagicMock(returncode=0)
-        assert VideoProcessing.is_ffmpeg_installed()
-
-    @patch("subprocess.run")
-    def test_is_ffmpeg_not_installed(self, mock_subprocess):
-        mock_subprocess.side_effect = FileNotFoundError()
-        assert not VideoProcessing.is_ffmpeg_installed()
-
-    @patch("subprocess.run")
-    def test_is_ffmpeg_exe_error(self, mock_subprocess):
-        mock_subprocess.return_value = MagicMock(returncode=1)
-        assert not VideoProcessing.is_ffmpeg_installed()

@@ -31,6 +31,7 @@ from pyannote.audio import Pipeline
 from open_dubbing import audio_processing
 from open_dubbing.demucs import Demucs
 from open_dubbing.exit_code import ExitCode
+from open_dubbing.ffmpeg import FFmpeg
 from open_dubbing.preprocessing import PreprocessingArtifacts
 from open_dubbing.speech_to_text import SpeechToText
 from open_dubbing.subtitles import Subtitles
@@ -458,7 +459,7 @@ class Dubber:
             subtitles_files.append(target_srt)
             languages_iso_639_3.append(self.target_language)
 
-        subtitles.embbed_in_video(
+        FFmpeg().embed_subtitles(
             video_file=self.postprocessing_output.video_file,
             subtitles_files=subtitles_files,
             languages_iso_639_3=languages_iso_639_3,

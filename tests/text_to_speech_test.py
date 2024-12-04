@@ -142,8 +142,8 @@ class TestTextToSpeech:
             tts,
             "_convert_text_to_speech_without_end_silence",
             return_value="dubbed_file_path",
-        ), patch.object(
-            tts, "_adjust_audio_speed"
+        ), patch(
+            "open_dubbing.ffmpeg.FFmpeg.adjust_audio_speed"
         ) as mock_adjust_speed, patch.object(
             tts, "_calculate_target_utterance_speed", return_value=calculated_speed
         ):

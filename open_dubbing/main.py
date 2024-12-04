@@ -23,6 +23,7 @@ from iso639 import Lang
 from open_dubbing.command_line import CommandLine
 from open_dubbing.dubbing import Dubber
 from open_dubbing.exit_code import ExitCode
+from open_dubbing.ffmpeg import FFmpeg
 from open_dubbing.speech_to_text_faster_whisper import SpeechToTextFasterWhisper
 from open_dubbing.speech_to_text_whisper_transformers import (
     SpeechToTextWhisperTransformers,
@@ -33,7 +34,6 @@ from open_dubbing.text_to_speech_edge import TextToSpeechEdge
 from open_dubbing.text_to_speech_mms import TextToSpeechMMS
 from open_dubbing.translation_apertium import TranslationApertium
 from open_dubbing.translation_nllb import TranslationNLLB
-from open_dubbing.video_processing import VideoProcessing
 
 
 def _init_logging(log_level):
@@ -200,7 +200,7 @@ def main():
 
     hugging_face_token = get_token(args.hugging_face_token)
 
-    if not VideoProcessing.is_ffmpeg_installed():
+    if not FFmpeg.is_ffmpeg_installed():
         msg = "You need to have ffmpeg (which includes ffprobe) installed."
         log_error_and_exit(msg, ExitCode.NO_FFMPEG)
 
