@@ -14,6 +14,7 @@
 
 import logging
 import os
+
 from abc import ABC, abstractmethod
 from typing import Final, List, Mapping, NamedTuple, Sequence
 
@@ -344,7 +345,7 @@ class TextToSpeech(ABC):
                         )
                     else:
                         FFmpeg().adjust_audio_speed(
-                            dubbed_file=dubbed_path,
+                            filename=dubbed_path,
                             speed=speed,
                         )
                         logging.debug(
