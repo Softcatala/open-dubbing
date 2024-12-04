@@ -18,6 +18,8 @@ import shutil
 import subprocess
 import tempfile
 
+from typing import List
+
 
 class FFmpeg:
 
@@ -83,3 +85,55 @@ class FFmpeg:
             FFmpeg()._run(command=cmd, fail=False)
         if os.path.exists(filename):
             os.remove(filename)
+
+    def embed_subtitles(
+        self,
+        *,
+        video_file: str,
+        subtitles_files: List[str],
+        languages_iso_639_3: List[str],
+    ) -> str:
+        filename = ""
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            shutil.copyfile(video_file, temp_file.name)
+            output_file = video_file  # Modify in-place
+
+            cmd = [
+                "ffmpeg",
+                "-y",  # Overwrite output files without asking
+                "-i",
+                temp_file.name,
+            ]
+
+            # Add subtitle inputs
+            for subtitles_file in subtitles_files:
+                cmd.extend(["-i", subtitles_file])
+
+            # Map streams
+            cmd.append("-map")
+            cmd.append("0")  # Map all streams from the main video file
+            for idx, language in enumerate(languages_iso_639_3):
+                cmd.extend(
+                    [
+                        "-map",
+                        str(idx + 1),  # Map each subtitle file
+                        "-c:s",
+                        "mov_text",  # Subtitle codec
+                        "-metadata:s:s:" + str(idx),
+                        f"language={language}",
+                    ]
+                )
+
+            # Add codecs for video and audio
+            cmd.extend(["-c:v", "copy", "-c:a", "copy", output_file])
+
+            logging.debug(f"embbed_in_video. Command: {' '.join(cmd)}")
+
+            # Run the command using the _run method
+            self._run(command=cmd, fail=True)
+            filename = temp_file.name
+
+        if os.path.exists(filename):
+            os.remove(filename)
+
+        return output_file

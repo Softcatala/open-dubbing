@@ -12,14 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
-import platform
-import shutil
-import tempfile
 
 from datetime import timedelta
-from typing import List
 
 
 class Subtitles:
@@ -43,37 +38,3 @@ class Subtitles:
                 srt_content += f"{text}\n\n"
                 subtitles_file.write(srt_content)
         return srt_file_path
-
-    def embbed_in_video(
-        self,
-        *,
-        video_file: str,
-        subtitles_files: List[str],
-        languages_iso_639_3: List[str],
-    ) -> str:
-
-        filename = ""
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            shutil.copyfile(video_file, temp_file.name)
-            null_device = (
-                "NUL" if platform.system().lower() == "windows" else "/dev/null"
-            )
-
-            cmd = f"ffmpeg -y -i {temp_file.name}"
-            for subtitles_file in subtitles_files:
-                cmd += f" -i {subtitles_file}"
-
-            cmd += " -map 0"
-            idx = 0
-            for language in languages_iso_639_3:
-                _map = 1 + idx
-                cmd += f" -map {_map} -c:s mov_text -metadata:s:s:{idx} language={language}"
-                idx += 1
-
-            cmd += f" -c:v copy -c:a copy {video_file} > {null_device} 2>&1"
-            logging.debug(f"embbed_in_video. Command: {cmd}")
-            os.system(cmd)
-            filename = temp_file.name
-
-        if os.path.exists(filename):
-            os.remove(filename)
