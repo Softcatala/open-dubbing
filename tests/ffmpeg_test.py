@@ -21,6 +21,12 @@ from open_dubbing.ffmpeg import FFmpeg
 
 class TestFFmpeg:
 
+    def _get_lines_from_file(self, filename):
+        with open(filename, "r") as file:
+            lines = file.readlines()
+            lines = [line.strip() for line in lines]
+        return lines
+
     def _get_srt(self):
         return [
             "1",
