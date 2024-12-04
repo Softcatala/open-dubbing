@@ -34,6 +34,17 @@ class FFmpeg:
                 if fail:
                     raise
 
+    def convert_to_format(self, *, source: str, target: str):
+        cmd = [
+            "ffmpeg",
+            "-hide_banner",
+            "-y",
+            "-i",
+            source,
+            target,
+        ]
+        FFmpeg()._run(command=cmd, fail=False)
+
     def remove_silence(self, *, filename: str):
         tmp_filename = ""
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:

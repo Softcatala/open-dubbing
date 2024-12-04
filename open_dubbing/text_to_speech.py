@@ -14,8 +14,6 @@
 
 import logging
 import os
-import platform
-
 from abc import ABC, abstractmethod
 from typing import Final, List, Mapping, NamedTuple, Sequence
 
@@ -88,10 +86,7 @@ class TextToSpeech(ABC):
         return voice_assignment
 
     def _convert_to_mp3(self, input_file, output_mp3):
-        null_device = "NUL" if platform.system().lower() == "windows" else "/dev/null"
-        cmd = f"ffmpeg -y -i {input_file} {output_mp3} > {null_device} 2>&1"
-        logging.debug(cmd)
-        os.system(cmd)
+        FFmpeg().convert_to_format(source=input_file, target=output_mp3)
         os.remove(input_file)
 
     def _add_text_to_speech_properties(
