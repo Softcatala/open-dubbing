@@ -84,8 +84,8 @@ class FFmpeg:
             ]
             FFmpeg()._run(command=cmd, fail=False)
 
-        if os.path.exists(filename):
-            os.remove(filename)
+        if os.path.exists(tmp_filename):
+            os.remove(tmp_filename)
 
     def embed_subtitles(
         self,
