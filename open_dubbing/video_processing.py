@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-import subprocess
 import warnings
 
 from typing import Final
@@ -89,18 +88,3 @@ class VideoProcessing:
             logger=None,
         )
         return dubbed_video_file
-
-    @staticmethod
-    def is_ffmpeg_installed():
-        cmd = ["ffprobe", "-version"]
-        try:
-            if (
-                subprocess.run(
-                    cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                ).returncode
-                == 0
-            ):
-                return True
-        except FileNotFoundError:
-            return False
-        return False

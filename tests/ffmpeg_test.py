@@ -16,6 +16,8 @@ import os
 import shutil
 import tempfile
 
+from unittest.mock import MagicMock, patch
+
 from open_dubbing.ffmpeg import FFmpeg
 
 
@@ -78,3 +80,19 @@ class TestFFmpeg:
         [os.remove(f) for f in [tmp_mp4_file.name, tmp_str_test.name]]
         expected = self._get_srt()
         assert subtitles == expected
+
+    @patch("subprocess.run")
+    def test_is_ffmpeg_installed(self, mock_subprocess):
+        # Test when ffmpeg is installed
+        mock_subprocess.return_value = MagicMock(returncode=0)
+        assert FFmpeg.is_ffmpeg_installed()
+
+    @patch("subprocess.run")
+    def test_is_ffmpeg_not_installed(self, mock_subprocess):
+        mock_subprocess.side_effect = FileNotFoundError()
+        assert not FFmpeg.is_ffmpeg_installed()
+
+    @patch("subprocess.run")
+    def test_is_ffmpeg_exe_error(self, mock_subprocess):
+        mock_subprocess.return_value = MagicMock(returncode=1)
+        assert not FFmpeg.is_ffmpeg_installed()

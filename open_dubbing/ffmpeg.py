@@ -137,3 +137,18 @@ class FFmpeg:
             os.remove(filename)
 
         return output_file
+
+    @staticmethod
+    def is_ffmpeg_installed():
+        cmd = ["ffprobe", "-version"]
+        try:
+            if (
+                subprocess.run(
+                    cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                ).returncode
+                == 0
+            ):
+                return True
+        except FileNotFoundError:
+            return False
+        return False
