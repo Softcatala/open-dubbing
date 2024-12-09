@@ -16,5 +16,5 @@ run-e2e-tests:
 publish-release:
 	rm dist/ -r -f
 	python setup.py sdist bdist_wheel
-	python -m  twine upload -u "$__token__" -p "${PYPI_API_TOKEN}" --repository-url https://upload.pypi.org/legacy/ dist/*
+	python -m  twine upload -u "__token__" -p "${PYPI_API_TOKEN}" --repository-url https://upload.pypi.org/legacy/ dist/*
 
