@@ -17,7 +17,7 @@ import warnings
 
 from typing import Final
 
-from moviepy.editor import AudioFileClip, VideoFileClip, concatenate_videoclips
+from moviepy import AudioFileClip, VideoFileClip, concatenate_videoclips
 
 _DEFAULT_FPS: Final[int] = 30
 _DEFAULT_DUBBED_VIDEO_FILE: Final[str] = "dubbed_video"
@@ -36,13 +36,13 @@ class VideoProcessing:
             warnings.filterwarnings("ignore", category=UserWarning)
             audio_clip = video_clip.audio
             audio_output_file = os.path.join(output_directory, filename + "_audio.mp3")
-            audio_clip.write_audiofile(audio_output_file, verbose=False, logger=None)
-            video_clip_without_audio = video_clip.set_audio(None)
+            audio_clip.write_audiofile(audio_output_file, logger=None)
+            video_clip_without_audio = video_clip.with_audio(None)
             fps = video_clip.fps or _DEFAULT_FPS
 
             video_output_file = os.path.join(output_directory, filename + "_video.mp4")
             video_clip_without_audio.write_videofile(
-                video_output_file, codec="libx264", fps=fps, verbose=False, logger=None
+                video_output_file, codec="libx264", fps=fps, logger=None
             )
         return video_output_file, audio_output_file
 
@@ -69,8 +69,8 @@ class VideoProcessing:
             )
             audio = concatenate_videoclips([audio, silence])
         elif duration_difference < 0:
-            audio = audio.subclip(0, video.duration)
-        final_clip = video.set_audio(audio)
+            audio = audio.subclipped(0, video.duration)
+        final_clip = video.with_audio(audio)
         target_language_suffix = "_" + target_language.replace("-", "_").lower()
         dubbed_video_file = os.path.join(
             output_directory,
@@ -84,7 +84,6 @@ class VideoProcessing:
             audio_codec="aac",
             temp_audiofile="temp-audio.m4a",
             remove_temp=True,
-            verbose=False,
             logger=None,
         )
         return dubbed_video_file

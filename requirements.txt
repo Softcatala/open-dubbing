@@ -1,5 +1,5 @@
 numpy >= 1.17.3
-moviepy == 1.0.3
+moviepy == 2.1.1
 demucs == 4.0.1
 psutil == 6.0.0
 torch >= 2.0.0,< 2.5
