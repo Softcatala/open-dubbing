@@ -13,11 +13,12 @@
 # limitations under the License.
 
 import os
-import warnings
 
 from typing import Final
 
 from moviepy.editor import AudioFileClip, VideoFileClip, concatenate_videoclips
+
+from open_dubbing.ffmpeg import FFmpeg
 
 _DEFAULT_FPS: Final[int] = 30
 _DEFAULT_DUBBED_VIDEO_FILE: Final[str] = "dubbed_video"
@@ -28,23 +29,9 @@ class VideoProcessing:
 
     @staticmethod
     def split_audio_video(*, video_file: str, output_directory: str) -> tuple[str, str]:
-        """Splits an audio/video file into separate audio and video files."""
-
-        base_filename = os.path.basename(video_file)
-        filename, _ = os.path.splitext(base_filename)
-        with VideoFileClip(video_file) as video_clip, warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=UserWarning)
-            audio_clip = video_clip.audio
-            audio_output_file = os.path.join(output_directory, filename + "_audio.mp3")
-            audio_clip.write_audiofile(audio_output_file, verbose=False, logger=None)
-            video_clip_without_audio = video_clip.set_audio(None)
-            fps = video_clip.fps or _DEFAULT_FPS
-
-            video_output_file = os.path.join(output_directory, filename + "_video.mp4")
-            video_clip_without_audio.write_videofile(
-                video_output_file, codec="libx264", fps=fps, verbose=False, logger=None
-            )
-        return video_output_file, audio_output_file
+        return FFmpeg().split_audio_video(
+            video_file=video_file, output_directory=output_directory
+        )
 
     @staticmethod
     def combine_audio_video(

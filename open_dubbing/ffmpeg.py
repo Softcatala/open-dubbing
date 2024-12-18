@@ -139,6 +139,39 @@ class FFmpeg:
 
         return output_file
 
+    def split_audio_video(
+        self, *, video_file: str, output_directory: str
+    ) -> tuple[str, str]:
+
+        base_filename = os.path.basename(video_file)
+        filename, _ = os.path.splitext(base_filename)
+        audio_output_file = os.path.join(output_directory, filename + "_audio.mp3")
+
+        cmd = [
+            "ffmpeg",
+            "-hide_banner",
+            "-vn",  # Disable video processing
+            "-y",
+            "-i",
+            video_file,
+            audio_output_file,
+        ]
+        FFmpeg()._run(command=cmd)
+
+        video_output_file = os.path.join(output_directory, filename + "_video.mp4")
+
+        cmd = [
+            "ffmpeg",
+            "-hide_banner",
+            "-an",  # Disable audio processing
+            "-y",
+            "-i",
+            video_file,
+            video_output_file,
+        ]
+        FFmpeg()._run(command=cmd)
+        return video_output_file, audio_output_file
+
     @staticmethod
     def is_ffmpeg_installed():
         cmd = ["ffprobe", "-version"]
