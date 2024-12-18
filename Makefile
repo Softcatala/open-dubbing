@@ -1,4 +1,4 @@
-.PHONY: dev run-tests
+.PHONY: dev run-tests publish-release run-e2e-tests create-baseline diff-baseline
 
 PATHS = open_dubbing/ tests/ e2e-tests/
 
@@ -18,3 +18,13 @@ publish-release:
 	python setup.py sdist bdist_wheel
 	python -m  twine upload -u "__token__" -p "${PYPI_API_TOKEN}" --repository-url https://upload.pypi.org/legacy/ dist/*
 
+# Tasks used to detect regressions
+create-baseline:
+	bash ./sc.sh
+	cd output && git init .
+	cd output && find . | grep json | xargs git add
+	cd output && git commit -a -m "baseline jsons"
+
+diff-baseline:
+	bash ./sc.sh
+	cd output && git diff > diff_baseline.diff
