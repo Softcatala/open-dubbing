@@ -1,4 +1,4 @@
-# Script that mimics Softcatalà setup
+# Script that mimics Softcatalà setup!
 rm -f open_dubbing.log
 pip install .
 rm -r -f output/
