@@ -114,7 +114,7 @@ class TestSubtitles:
         directory = os.path.dirname(srt_file)
         filename = os.path.basename(srt_file)
         subtitles.write(
-            utterance_metadata=self._get_utterances(),
+            utterance_metadata=self._get_utterances_small_digits(),
             directory=directory,
             filename=filename,
             translated=False,
