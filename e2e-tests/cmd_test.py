@@ -85,7 +85,7 @@ class TestCmd:
                 ), "Utterance end check failed"
 
                 assert "- Bon dia. - Bé." == text_array[0], "translated text 0"
-                assert "El meu nom és Jordi Mas." == text_array[1], "translated text 1"
+                assert "Em dic Jordi Mas." == text_array[1], "translated text 1"
                 assert "Sóc de Barcelona." == text_array[2], "translated text 2"
                 assert (
                     "I m'encanta aquesta ciutat." == text_array[3]
