@@ -126,5 +126,5 @@ class TestSubtitles:
             "1",
             "00:00:01,000 --> 00:00:03,100",
             "Good morning, my name is Jordi Mas.",
-            ""
+            "",
         ]
