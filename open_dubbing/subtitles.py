@@ -20,22 +20,30 @@ from datetime import timedelta
 class Subtitles:
 
     def write(self, *, utterance_metadata, directory, filename, translated):
-        srt_file_path = filename
-        srt_file_path = os.path.join(directory, srt_file_path)
+        srt_file_path = os.path.join(directory, filename)
 
         with open(srt_file_path, "w", encoding="utf-8") as subtitles_file:
             for i, utterance in enumerate(utterance_metadata):
-                start_time = str(timedelta(seconds=utterance["start"]))[:-3]
-                end_time = str(timedelta(seconds=utterance["end"]))[:-3]
-                start_time = start_time.replace(".", ",").zfill(12)
-                end_time = end_time.replace(".", ",").zfill(12)
+                # Convert start and end times to the proper format
+                start_time = self.format_srt_time(utterance["start"])
+                end_time = self.format_srt_time(utterance["end"])
+
                 idx = i + 1
                 srt_content = f"{idx}\n"
-                srt_content += (
-                    f"{start_time.replace('.', ',')} --> {end_time.replace('.', ',')}\n"
-                )
+                srt_content += f"{start_time} --> {end_time}\n"
 
                 text = utterance["translated_text"] if translated else utterance["text"]
                 srt_content += f"{text}\n\n"
                 subtitles_file.write(srt_content)
         return srt_file_path
+
+    @staticmethod
+    def format_srt_time(seconds):
+        """Format seconds as HH:MM:SS,mmm for SRT files."""
+        time_delta = timedelta(seconds=seconds)
+        total_seconds = int(time_delta.total_seconds())
+        milliseconds = int((time_delta.total_seconds() - total_seconds) * 1000)
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        return f"{hours:02}:{minutes:02}:{seconds:02},{milliseconds:03}"
