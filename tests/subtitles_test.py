@@ -95,15 +95,3 @@ class TestSubtitles:
             "Sóc de Barcelona.",
             "",
         ]
-
-    def _get_srt(self):
-        return [
-            "1",
-            "00:00:01,262 --> 00:00:03,945",
-            "Bon dia, el meu nom és Jordi Mas.",
-            "",
-            "2",
-            "00:00:05,245 --> 00:00:06,629",
-            "Sóc de Barcelona.",
-            "",
-        ]
