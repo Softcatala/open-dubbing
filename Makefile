@@ -1,4 +1,4 @@
-.PHONY: dev run-tests
+.PHONY: dev run-tests run-e2e-tests publish-release
 
 PATHS = open_dubbing/ tests/ e2e-tests/
 

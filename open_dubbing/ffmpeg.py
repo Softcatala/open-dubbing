@@ -93,7 +93,7 @@ class FFmpeg:
         video_file: str,
         subtitles_files: List[str],
         languages_iso_639_3: List[str],
-    ) -> str:
+    ):
         filename = ""
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             shutil.copyfile(video_file, temp_file.name)
@@ -131,13 +131,11 @@ class FFmpeg:
             logging.debug(f"embed_subtitles. Command: {' '.join(cmd)}")
 
             # Run the command using the _run method
-            self._run(command=cmd, fail=True)
+            self._run(command=cmd, fail=False)
             filename = temp_file.name
 
         if os.path.exists(filename):
             os.remove(filename)
-
-        return output_file
 
     @staticmethod
     def is_ffmpeg_installed():
