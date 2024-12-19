@@ -24,7 +24,6 @@ class Subtitles:
 
         with open(srt_file_path, "w", encoding="utf-8") as subtitles_file:
             for i, utterance in enumerate(utterance_metadata):
-                # Convert start and end times to the proper format
                 start_time = self.format_srt_time(utterance["start"])
                 end_time = self.format_srt_time(utterance["end"])
 
