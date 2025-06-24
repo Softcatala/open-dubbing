@@ -196,7 +196,7 @@ class Dubber:
         demucs_command = demucs.build_demucs_command(
             audio_file=audio_file,
             output_directory=self.output_directory,
-            device=self.device,
+            device=os.getenv("DEMUCS_DEVICE", self.device),
         )
         demucs.execute_demucs_command(command=demucs_command)
         audio_vocals_file, audio_background_file = (
@@ -206,7 +206,7 @@ class Dubber:
         utterance_metadata = audio_processing.create_pyannote_timestamps(
             audio_file=audio_file,
             pipeline=self.pyannote_pipeline,
-            device=self.device,
+            device=os.getenv("PYANNOTE_DEVICE", self.device),
         )
         utterance_metadata = audio_processing.run_cut_and_save_audio(
             utterance_metadata=utterance_metadata,
