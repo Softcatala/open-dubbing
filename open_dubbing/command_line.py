@@ -197,6 +197,13 @@ class CommandLine:
         )
 
         parser.add_argument(
+            "--input_srt",
+            type=str,
+            default="",
+            help=("A .srt file with speaker annotations that overrides audio segmentation, speaker diarization and speech to text"),
+        )
+        
+        parser.add_argument(
             "--original_subtitles",
             action="store_true",
             default=False,

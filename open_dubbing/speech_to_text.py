@@ -15,6 +15,7 @@
 import array
 import os
 import re
+import pysrt
 
 from abc import ABC, abstractmethod
 from typing import Mapping, Sequence
@@ -79,35 +80,67 @@ class SpeechToText(ABC):
         fixed = fixed.strip()
         return fixed
 
+    def _srt_time_to_seconds(self, t):
+        return t.hours * 3600 + t.minutes * 60 + t.seconds + t.milliseconds / 1000.0
+
     def transcribe_audio_chunks(
         self,
         *,
         utterance_metadata: Sequence[Mapping[str, float | str]],
         source_language: str,
         no_dubbing_phrases: Sequence[str],
+        input_srt: str | None = None,
     ) -> Sequence[Mapping[str, float | str]]:
 
         logger().debug(f"transcribe_audio_chunks: {source_language}")
         iso_639_1 = self._get_iso_639_1(source_language)
+
+        if input_srt:
+            logger().debug(f"transcribe_audio_chunks: read transcripts from from {input_srt}")
+            subs = pysrt.open(input_srt)
 
         updated_utterance_metadata = []
         for item in utterance_metadata:
             new_item = item.copy()
             path = ""
             try:
-                path = item["path"]
-                duration = item["end"] - item["start"]
-                if self._is_short_audio(duration=duration):
-                    transcribed_text = ""
-                    logger().debug(
-                        f"speech_to_text._is_short_audio. Audio is less than {self.MIN_SECS} second, skipping transcription of '{path}'."
-                    )
+                if not input_srt:
+                    path = item["path"]
+                    duration = item["end"] - item["start"]
+                    if self._is_short_audio(duration=duration):
+                        transcribed_text = ""
+                        logger().debug(
+                            f"speech_to_text._is_short_audio. Audio is less than {self.MIN_SECS} second, skipping transcription of '{path}'."
+                        )
+                    else:
+                        transcribed_text = self._transcribe(
+                            vocals_filepath=path,
+                            source_language_iso_639_1=iso_639_1,
+                        )
+                        transcribed_text = self._make_sure_single_space(transcribed_text)
                 else:
-                    transcribed_text = self._transcribe(
-                        vocals_filepath=path,
-                        source_language_iso_639_1=iso_639_1,
-                    )
-                    transcribed_text = self._make_sure_single_space(transcribed_text)
+                    match = None
+                    time_tolerance=0.05
+                    for sub in subs:
+                        target_start = item["start"]
+                        target_end = item["end"]
+                        sub_start = self._srt_time_to_seconds(sub.start)
+                        sub_end = self._srt_time_to_seconds(sub.end)
+            
+                        if (abs(sub_start - target_start) <= time_tolerance and
+                            abs(sub_end - target_end) <= time_tolerance):
+            
+                            # Remove the [SPEAKER_XX]: tag
+                            clean_text = re.sub(r'^\[SPEAKER_\d{2}\]:\s*', '', sub.text.strip())
+                            match = clean_text
+                            break
+            
+                    if match is None:
+                        print(f"\n⚠️ WARNING: No subtitle match found for time range {target_start:.3f}–{target_end:.3f} seconds "
+                              f"(speaker {meta.get('speaker_id', 'UNKNOWN')})\n")
+                        transcribed_text = self._make_sure_single_space("")
+                    else:
+                        transcribed_text = self._make_sure_single_space(match)
             except Exception as e:
                 logger().error(
                     f"speech_to_text.transcribe_audio_chunks. file '{path}', error: '{e}'"
