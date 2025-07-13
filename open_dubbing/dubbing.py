@@ -108,6 +108,8 @@ class Dubber:
         clean_intermediate_files: bool = False,
         original_subtitles: bool = False,
         dubbed_subtitles: bool = False,
+        input_srt: str | None = None,
+        
     ) -> None:
         self._input_file = input_file
         self.output_directory = output_directory
@@ -128,6 +130,7 @@ class Dubber:
         self.preprocessing_output = None
         self.original_subtitles = original_subtitles
         self.dubbed_subtitles = dubbed_subtitles
+        self.input_srt = input_srt
 
         if cpu_threads > 0:
             torch.set_num_threads(cpu_threads)
@@ -210,6 +213,7 @@ class Dubber:
             audio_file=audio_file,
             pipeline=self.pyannote_pipeline,
             device=device_pyannote,
+            input_srt=self.input_srt,
         )
         utterance_metadata = audio_processing.run_cut_and_save_audio(
             utterance_metadata=utterance_metadata,
@@ -240,6 +244,7 @@ class Dubber:
             utterance_metadata=self.utterance_metadata,
             source_language=self.source_language,
             no_dubbing_phrases=[],
+            input_srt=self.input_srt,
         )
         speaker_info = self.stt.predict_gender(
             file=media_file,

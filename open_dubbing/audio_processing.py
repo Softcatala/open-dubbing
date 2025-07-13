@@ -16,6 +16,9 @@
 import os
 import warnings
 
+import pysrt
+import re
+
 from typing import Final, Mapping, Sequence
 
 import numpy as np
@@ -37,6 +40,7 @@ def create_pyannote_timestamps(
     audio_file: str,
     pipeline: Pipeline,
     device: str = "cpu",
+    input_srt: str | None = None,
 ) -> Sequence[Mapping[str, float]]:
     """Creates timestamps from a vocals file using Pyannote speaker diarization.
 
@@ -44,15 +48,43 @@ def create_pyannote_timestamps(
         A list of dictionaries containing start and end timestamps for each
         speaker segment.
     """
-    with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=UserWarning)
-        if device == "cuda":
-            pipeline.to(torch.device("cuda"))
-        diarization = pipeline(audio_file)
-        utterance_metadata = [
-            {"start": segment.start, "end": segment.end, "speaker_id": speaker}
-            for segment, _, speaker in diarization.itertracks(yield_label=True)
-        ]
+    if not input_srt:
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=UserWarning)
+            if device == "cuda":
+                pipeline.to(torch.device("cuda"))
+            diarization = pipeline(audio_file)
+            utterance_metadata = [
+                {"start": segment.start, "end": segment.end, "speaker_id": speaker}
+                for segment, _, speaker in diarization.itertracks(yield_label=True)
+            ]
+            return utterance_metadata
+    else:
+        subs = pysrt.open(input_srt)
+        utterance_metadata = []
+    
+        for sub in subs:
+            match = re.match(r'\[(SPEAKER_\d+)\]:', sub.text.strip())
+            if match:
+                speaker_id = match.group(1)
+                start_seconds = (
+                    sub.start.hours * 3600 +
+                    sub.start.minutes * 60 +
+                    sub.start.seconds +
+                    sub.start.milliseconds / 1000
+                )
+                end_seconds = (
+                    sub.end.hours * 3600 +
+                    sub.end.minutes * 60 +
+                    sub.end.seconds +
+                    sub.end.milliseconds / 1000
+                )
+                utterance_metadata.append({
+                    "start": round(start_seconds, 3),
+                    "end": round(end_seconds, 3),
+                    "speaker_id": speaker_id
+                })
+    
         return utterance_metadata
 
 

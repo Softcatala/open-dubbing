@@ -313,6 +313,7 @@ def main():
         clean_intermediate_files=args.clean_intermediate_files,
         original_subtitles=args.original_subtitles,
         dubbed_subtitles=args.dubbed_subtitles,
+        input_srt=args.input_srt,
     )
 
     logger().info(
