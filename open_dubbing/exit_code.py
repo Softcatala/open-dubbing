@@ -30,3 +30,4 @@ class ExitCode(IntEnum):
     UPDATE_MISSING_FILES = 111
     NO_OPENAI_TTS = 112
     NO_OPENAI_KEY = 113
+    NO_CAMB_KEY = 114

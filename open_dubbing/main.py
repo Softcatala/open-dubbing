@@ -151,6 +151,7 @@ def _get_selected_tts(
     tts_api_server: str,
     device: str,
     openai_api_key: str,
+    camb_api_key: str = "",
 ):
     if selected_tts == "mms":
         tts = TextToSpeechMMS(device)
@@ -188,6 +189,11 @@ def _get_selected_tts(
 
         key = _get_openai_key(key=openai_api_key)
         tts = TextToSpeechOpenAI(device=device, api_key=key)
+    elif selected_tts == "camb":
+        from open_dubbing.text_to_speech_camb import TextToSpeechCamb
+
+        key = _get_camb_key(key=camb_api_key)
+        tts = TextToSpeechCamb(device=device, api_key=key)
     else:
         raise ValueError(f"Invalid tts value {selected_tts}")
 
@@ -195,7 +201,7 @@ def _get_selected_tts(
 
 
 def _get_selected_translator(
-    translator: str, nllb_model: str, apertium_server: str, device: str
+    translator: str, nllb_model: str, apertium_server: str, device: str, camb_api_key: str = ""
 ):
     if translator == "nllb":
         translation = TranslationNLLB(device)
@@ -208,10 +214,29 @@ def _get_selected_translator(
 
         translation = TranslationApertium(device)
         translation.set_server(server)
+    elif translator == "camb":
+        from open_dubbing.translation_camb import TranslationCamb
+
+        key = _get_camb_key(key=camb_api_key)
+        translation = TranslationCamb(device, api_key=key)
+        translation.load_model()
     else:
         raise ValueError(f"Invalid translator value {translator}")
 
     return translation
+
+
+def _get_camb_key(*, key: str):
+    if key:
+        return key
+
+    VAR = "CAMB_API_KEY"
+    key = os.getenv(VAR)
+    if key:
+        return key
+
+    msg = f"CAMB AI selected but no key has been passed as argument or defined in the environment variable {VAR}"
+    log_error_and_exit(msg, ExitCode.NO_CAMB_KEY)
 
 
 def _get_openai_key(*, key: str):
@@ -228,6 +253,9 @@ def _get_openai_key(*, key: str):
 
 
 def main():
+    from dotenv import load_dotenv
+
+    load_dotenv()
 
     args = CommandLine.read_parameters()
     _init_logging(args.log_level)
@@ -240,12 +268,15 @@ def main():
         msg = "You need to have ffmpeg (which includes ffprobe) installed."
         log_error_and_exit(msg, ExitCode.NO_FFMPEG)
 
+    camb_api_key = getattr(args, "camb_api_key", None) or ""
+
     tts = _get_selected_tts(
         args.tts,
         args.tts_cli_cfg_file,
         args.tts_api_server,
         args.device,
         args.openai_api_key,
+        camb_api_key=camb_api_key,
     )
 
     if sys.platform == "darwin":
@@ -253,7 +284,12 @@ def main():
 
     stt_type = args.stt
     stt_text = args.stt
-    if stt_type == "faster-whisper" or (
+    if stt_type == "camb":
+        from open_dubbing.speech_to_text_camb import SpeechToTextCamb
+
+        key = _get_camb_key(key=camb_api_key)
+        stt = SpeechToTextCamb(device=args.device, api_key=key)
+    elif stt_type == "faster-whisper" or (
         stt_type == "auto" and sys.platform != "darwin"
     ):
         stt = SpeechToTextFasterWhisper(
@@ -282,7 +318,8 @@ def main():
         logger().info(f"Detected language '{source_language}'")
 
     translation = _get_selected_translator(
-        args.translator, args.nllb_model, args.apertium_server, args.device
+        args.translator, args.nllb_model, args.apertium_server, args.device,
+        camb_api_key=camb_api_key,
     )
 
     check_languages(

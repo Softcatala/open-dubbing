@@ -69,7 +69,7 @@ class CommandLine:
             "--tts",
             type=str,
             default="mms",
-            choices=["mms", "coqui", "openai", "edge", "cli", "api"],
+            choices=["mms", "coqui", "openai", "edge", "cli", "api", "camb"],
             help=(
                 "Text to Speech engine to use. Choices are:\n"
                 "'mms': Meta Multilingual Speech engine, supports +1100 languages.\n"
@@ -78,6 +78,7 @@ class CommandLine:
                 "'edge': Microsoft Edge TTS.\n"
                 "'cli': User defined TTS invoked from command line.\n"
                 "'api': Implements a user defined TTS API contract to enable non supported TTS.\n"
+                "'camb': CAMB AI TTS with voice cloning support, 16 languages.\n"
             ),
         )
         parser.add_argument(
@@ -89,12 +90,13 @@ class CommandLine:
             "--stt",
             type=str,
             default="auto",
-            choices=["auto", "faster-whisper", "transformers"],
+            choices=["auto", "faster-whisper", "transformers", "camb"],
             help=(
                 "Speech to text. Choices are:\n"
                 "'auto': Autoselect best implementation.\n"
                 "'faster-whisper': Faster-whisper's OpenAI whisper implementation.\n"
                 "'transformers': Transformers OpenAI whisper implementation.\n"
+                "'camb': CAMB AI cloud transcription.\n"
             ),
         )
         parser.add_argument(
@@ -107,11 +109,12 @@ class CommandLine:
             "--translator",
             type=str,
             default="nllb",
-            choices=["nllb", "apertium"],
+            choices=["nllb", "apertium", "camb"],
             help=(
                 "Translation engine to use. Choices are:\n"
                 "'nllb': Meta's no Language Left Behind (NLLB).\n"
                 "'apertium': Apertium compatible API server.\n"
+                "'camb': CAMB AI cloud translation, 16 languages.\n"
             ),
         )
         parser.add_argument(
@@ -190,6 +193,12 @@ class CommandLine:
             default="",
             help=("TTS api server URL when using the 'API' tts"),
         )
+        parser.add_argument(
+            "--camb_api_key",
+            default=None,
+            help="CAMB AI API key used for CAMB TTS, translation, and STT. Can also be set via CAMB_API_KEY environment variable.",
+        )
+
         parser.add_argument(
             "--update",
             action="store_true",
