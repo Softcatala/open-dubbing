@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  open-dubbing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: open-dubbing
+    ports:
+      - "8000:8000"
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    restart: unless-stopped

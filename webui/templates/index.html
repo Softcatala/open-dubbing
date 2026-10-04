@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Open Dubbing</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --panel: #111827;
+        --panel-soft: #1f2937;
+        --accent: #38bdf8;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --error: #fca5a5;
+        --success: #86efac;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: linear-gradient(135deg, #020817, #111827);
+        color: var(--text);
+      }
+      .container {
+        max-width: 960px;
+        margin: 40px auto;
+        padding: 20px;
+      }
+      .panel {
+        background: rgba(17, 24, 39, 0.95);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 16px;
+        padding: 32px;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.35);
+      }
+      h1 {
+        margin: 0 0 8px 0;
+        font-size: 2.5rem;
+      }
+      .subtitle {
+        color: var(--muted);
+        margin-bottom: 32px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      input, select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        background: var(--panel-soft);
+        color: var(--text);
+        font-size: 0.95rem;
+      }
+      input:focus, select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+      }
+      button {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: none;
+        background: var(--accent);
+        color: #082f49;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 24px;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2);
+      }
+      .result {
+        margin-top: 32px;
+        padding: 20px;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+      .status-success { border-color: rgba(134, 239, 172, 0.5); }
+      .status-error { border-color: rgba(252, 165, 165, 0.5); }
+      .mono {
+        font-family: "SFMono-Regular", Consolas, "Monaco", monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-size: 0.85rem;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 12px;
+        border-radius: 6px;
+        overflow-x: auto;
+      }
+      h2 { margin-top: 0; }
+      h3 { color: var(--accent); }
+      ul { padding-left: 20px; }
+      li { margin-bottom: 6px; }
+      .muted { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="panel">
+        <h1>🎬 Open Dubbing</h1>
+        <p class="subtitle">Upload a video and generate dubbed versions in different languages</p>
+
+        <form method="post" action="/process" enctype="multipart/form-data">
+          <div class="grid">
+            <div>
+              <label for="video">📁 Video file (MP4)</label>
+              <input id="video" name="video" type="file" accept=".mp4,video/mp4" required />
+            </div>
+            <div>
+              <label for="target_language">🎯 Target language</label>
+              <input id="target_language" name="target_language" type="text" value="cat" placeholder="cat" required title="ISO 639-3 code" />
+            </div>
+            <div>
+              <label for="source_language">📝 Source language (optional)</label>
+              <input id="source_language" name="source_language" type="text" placeholder="eng" title="ISO 639-3 code" />
+            </div>
+            <div>
+              <label for="hugging_face_token">🔑 Hugging Face token</label>
+              <input id="hugging_face_token" name="hugging_face_token" type="password" placeholder="hf_..." />
+            </div>
+            <div>
+              <label for="tts">🔊 TTS Engine</label>
+              <select id="tts" name="tts">
+                <option value="mms">MMS (Meta)</option>
+                <option value="edge">Edge (Microsoft)</option>
+                <option value="openai">OpenAI</option>
+                <option value="coqui">Coqui</option>
+              </select>
+            </div>
+            <div>
+              <label for="translator">🌐 Translator</label>
+              <select id="translator" name="translator">
+                <option value="nllb">NLLB (Meta)</option>
+                <option value="apertium">Apertium</option>
+              </select>
+            </div>
+            <div>
+              <label for="device">⚡ Device</label>
+              <select id="device" name="device">
+                <option value="cpu">CPU</option>
+                <option value="cuda">CUDA</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit">▶️ Start Dubbing</button>
+        </form>
+
+        {% if result %}
+          <div class="result status-{{ result.status }}">
+            <h2>📊 Result</h2>
+            <p><strong>Status:</strong> <span style="color: {% if result.status == 'success' %}var(--success){% else %}var(--error){% endif %}">{{ result.status.upper() }}</span></p>
+
+            <h3>Command executed:</h3>
+            <div class="mono">{{ result.command }}</div>
+
+            {% if result.files %}
+              <h3>✅ Generated files:</h3>
+              <ul>
+                {% for file in result.files %}
+                  <li><code>{{ file }}</code></li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="muted">No output files generated yet.</p>
+            {% endif %}
+
+            {% if result.stdout %}
+              <h3>📋 Output:</h3>
+              <div class="mono">{{ result.stdout }}</div>
+            {% endif %}
+
+            {% if result.stderr %}
+              <h3>⚠️ Errors/Warnings:</h3>
+              <div class="mono">{{ result.stderr }}</div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </body>
+</html>
